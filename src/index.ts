@@ -6,10 +6,11 @@ const port = process.env.PORT || 3000;
 const jsonBodyMiddleware = bodyParser.json()
 app.use (jsonBodyMiddleware)
 
-app.use(′/products′, productsRouter) 
+app.use('/blogs', blogsRouter) 
+app.use('/posts', postsRouter) 
 
 
-app.delete("/testing/all−data", async (req: Request, res: Response) => {
+app.delete("/testing/all-data", async (req: Request, res: Response) => {
   let result = await blogsCollections.deleteMany({});
   let result1 =await postsCollections.deleteMany({});
   

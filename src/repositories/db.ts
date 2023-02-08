@@ -1,6 +1,7 @@
 import { MongoClient } from "mongodb";
 import * as dotenv from 'dotenv'
 import { BlogViewModel, PostViewModel } from "../types";
+
 dotenv.config()
 
 const mongoUri = process.env.MONGO_URL;
