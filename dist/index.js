@@ -14,14 +14,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
+const blogs_router_1 = require("./routers/blogs-router");
+const db_1 = require("./repositories/db");
 const app = (0, express_1.default)();
 const port = process.env.PORT || 3000;
 const jsonBodyMiddleware = body_parser_1.default.json();
 app.use(jsonBodyMiddleware);
-app.use('/blogs', blogsRouter);
+app.use('/blogs', blogs_router_1.blogsRouter);
 app.use('/posts', postsRouter);
 app.delete("/testing/all-data", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let result = yield blogsCollections.deleteMany({});
+    let result = yield db_1.blogsCollections.deleteMany({});
     let result1 = yield postsCollections.deleteMany({});
     res.send(204);
 }));

@@ -41,12 +41,18 @@ exports.blogsRepository = {
                 .skip(ItPageNumber * ItPageSize)
                 .limit(ItPageSize)
                 .toArray();
+            const n = [...arrayOfFoundBlogs].sort((u1, u2) => {
+                if (u1[ItSortBy] < u2[ItSortBy]) {
+                    return ItSortDirection === "asc" ? -1 : 1;
+                }
+                return 0;
+            });
             const newPaginatorBlog = {
                 pagesCount: ItpagesCount,
                 page: ItPageNumber,
                 pageSize: ItPageSize,
                 totalCount: IttotalCount,
-                items: arrayOfFoundBlogs,
+                items: n,
             };
             return newPaginatorBlog;
         });
@@ -61,6 +67,60 @@ exports.blogsRepository = {
         return __awaiter(this, void 0, void 0, function* () {
             const result = yield db_1.blogsCollections.insertOne(createdBlog);
             return exports.blogsRepository.findBlogById(createdBlog.id);
+        });
+    },
+    updateBlog(id, name, description, websiteUrl) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const result = yield db_1.blogsCollections.updateOne({ id: id }, { $set: { name: name, description: description, websiteUrl: websiteUrl } });
+            return result.matchedCount === 1;
+        });
+    },
+    deleteBlog(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const result = yield db_1.blogsCollections.deleteOne({ id: id });
+            return result.deletedCount === 1;
+        });
+    },
+    findPostsByBlogerId(id, sortBy, pageNumber, pageSize, sortDirection) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let ItSortBy = "createdAt";
+            if (sortBy != (undefined || null)) {
+                ItSortBy = sortBy;
+            }
+            let ItSortDirection = "desc";
+            if (sortDirection != (undefined || null)) {
+                ItSortDirection = sortDirection;
+            }
+            let ItPageNumber = 1;
+            if (pageNumber != (undefined || null)) {
+                ItPageNumber = Number(pageNumber);
+            }
+            let ItPageSize = 10;
+            if (pageSize != (undefined || null)) {
+                ItPageSize = Number(pageSize);
+            }
+            const IttotalCount = yield db_1.blogsCollections.countDocuments({ blogId: id });
+            const ItpagesCount = Math.ceil(IttotalCount / ItPageSize);
+            const arrayOfFoundBlogs = yield db_1.blogsCollections
+                .find({ blogId: id }, { projection: { _id: 0 } })
+                .skip(ItPageNumber * ItPageSize)
+                .limit(ItPageSize)
+                .toArray();
+            const n = [...arrayOfFoundBlogs].sort((u1, u2) => {
+                if (u1[ItSortBy] < u2[ItSortBy]) {
+                    return ItSortDirection === "asc" ? -1 : 1;
+                }
+                return 0;
+            });
+            const newPaginatorBlog = {
+                pagesCount: ItpagesCount,
+                page: ItPageNumber,
+                pageSize: ItPageSize,
+                totalCount: IttotalCount,
+                items: n,
+            };
+            return newPaginatorBlog;
+            return newPaginatorBlog;
         });
     }
 };

@@ -9,47 +9,53 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.blogsService = void 0;
+exports.postsService = void 0;
 const blogs_repository_1 = require("../repositories/blogs-repository");
 const db_1 = require("../repositories/db");
-exports.blogsService = {
-    createBlog(name, description, websiteUrl) {
+const posts_repository_1 = require("../repositories/posts-repository");
+exports.postsService = {
+    createPost(title, shortDescription, content, blogId) {
         return __awaiter(this, void 0, void 0, function* () {
             let isId = "";
             let schetchik = false;
             let i = 0;
             do {
                 i++;
-                let findIdPost = yield db_1.blogsCollections.findOne({ id: String(i) });
+                let findIdPost = yield db_1.postsCollections.findOne({ id: String(i) });
                 if (!findIdPost) {
                     isId = String(i);
                     schetchik = true;
                 }
             } while (schetchik === false);
+            let isPostName = "";
+            let a = yield blogs_repository_1.blogsRepository.findBlogById(blogId);
+            if (a) {
+                isPostName = a.name;
+            }
             let isCreateAt = "";
             const today = new Date();
             isCreateAt = today.toISOString();
-            let isIsMembership = true;
-            const createdBlog = {
+            const createdPost = {
                 id: isId,
-                name: name,
-                description: description,
-                websiteUrl: websiteUrl,
+                title: title,
+                shortDescription: shortDescription,
+                content: content,
+                blogId: blogId,
+                blogName: isPostName,
                 createdAt: isCreateAt,
-                isMembership: isIsMembership,
             };
-            const result = yield blogs_repository_1.blogsRepository.createBlog(createdBlog);
+            const result = yield posts_repository_1.postsRepository.createPost(createdPost);
             return result;
         });
     },
-    updateBlog(id, name, description, websiteUrl) {
+    updatePost(id, title, shortDescription, content, blogId) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield blogs_repository_1.blogsRepository.updateBlog(id, name, description, websiteUrl);
+            return yield posts_repository_1.postsRepository.updatePost(id, title, shortDescription, content, blogId);
         });
     },
-    deleteBlog(id) {
+    deletePost(id) {
         return __awaiter(this, void 0, void 0, function* () {
-            return yield blogs_repository_1.blogsRepository.deleteBlog(id);
+            return yield posts_repository_1.postsRepository.deletePost(id);
         });
     },
 };
