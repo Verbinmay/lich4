@@ -12,6 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.blogsRouter = void 0;
 const express_1 = require("express");
 const blogs_server_1 = require("../domain/blogs-server");
+const posts_server_1 = require("../domain/posts-server");
 const blogs_repository_1 = require("../repositories/blogs-repository");
 exports.blogsRouter = (0, express_1.Router)({});
 exports.blogsRouter.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -107,4 +108,17 @@ exports.blogsRouter.get("/:id/posts", (req, res) => __awaiter(void 0, void 0, vo
     else {
         res.send(404);
     }
+}));
+exports.blogsRouter.post("/:id/posts", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const newPostByIdInBd = yield posts_server_1.postsService.createPost(req.body.title, req.body.shortDescription, req.body.content, req.path);
+    const newPost = {
+        id: newPostByIdInBd.id,
+        title: newPostByIdInBd.title,
+        shortDescription: newPostByIdInBd.shortDescription,
+        content: newPostByIdInBd.content,
+        blogId: newPostByIdInBd.blogId,
+        blogName: newPostByIdInBd.blogName,
+        createdAt: newPostByIdInBd.createdAt,
+    };
+    res.status(201).send(newPost);
 }));

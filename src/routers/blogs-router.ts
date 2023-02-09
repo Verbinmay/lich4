@@ -1,7 +1,10 @@
 import { Request, Response, Router } from "express";
 import { blogsService } from "../domain/blogs-server";
+import { postsService } from "../domain/posts-server";
+import { avtorizationValidationMiddleware } from "../middlewares/Avtorization-middleware";
+import { websiteUrlValidation, nameValidation, descriptionValidation, inputValidationMiddleware, shortDescriptionValidation, titleValidation, contentValidation, isBlogIdValidationInPath } from "../middlewares/input-validation-middleware";
 import { blogsRepository } from "../repositories/blogs-repository";
-import { BlogViewModel, PaginatorBlog } from "../types";
+import { BlogViewModel, PaginatorBlog, PostViewModel } from "../types";
 
 export const blogsRouter = Router({});
 
@@ -49,7 +52,13 @@ blogsRouter.get("/:id", async (req: Request, res: Response) => {
   }
 });
 
-blogsRouter.post("/", async (req: Request, res: Response) => {
+blogsRouter.post("/",
+avtorizationValidationMiddleware,
+    websiteUrlValidation,
+    nameValidation,
+    descriptionValidation,
+    inputValidationMiddleware,
+async (req: Request, res: Response) => {
   const newBlogInBd = await blogsService.createBlog(
     req.body.name,
     req.body.description,
@@ -66,7 +75,13 @@ blogsRouter.post("/", async (req: Request, res: Response) => {
   res.status(201).send(newBlog);
 });
 
-blogsRouter.put("/:id", async (req: Request, res: Response) => {
+blogsRouter.put("/:id", 
+avtorizationValidationMiddleware,
+websiteUrlValidation,
+nameValidation,
+descriptionValidation,
+inputValidationMiddleware,
+async (req: Request, res: Response) => {
   const updateBlogInBd = await blogsService.updateBlog(
     req.params.id,
     req.body.name,
@@ -80,7 +95,9 @@ blogsRouter.put("/:id", async (req: Request, res: Response) => {
   }
 });
 
-blogsRouter.delete("/:id", async (req: Request, res: Response) => {
+blogsRouter.delete("/:id",
+avtorizationValidationMiddleware,
+async (req: Request, res: Response) => {
   const DeleteBlogInBd = await blogsService.deleteBlog(req.params.id);
   if (DeleteBlogInBd) {
     res.send(204);
@@ -119,3 +136,29 @@ blogsRouter.get("/:id/posts", async (req: Request, res: Response) => {
     res.send(404);
   }
 });
+blogsRouter.post("/:id/posts",
+avtorizationValidationMiddleware,
+shortDescriptionValidation,
+    titleValidation,
+    contentValidation,
+    isBlogIdValidationInPath,
+    inputValidationMiddleware,
+async( req:Request, res:Response)=> {
+  const newPostByIdInBd = await postsService.createPost(
+    
+    req.body.title,
+    req.body.shortDescription,
+    req.body.content,
+    req.path,
+  );
+  const newPost: PostViewModel = {
+    id: newPostByIdInBd!.id,
+    title: newPostByIdInBd!.title,
+    shortDescription: newPostByIdInBd!.shortDescription,
+    content: newPostByIdInBd!.content,
+    blogId: newPostByIdInBd!.blogId,
+    blogName: newPostByIdInBd!.blogName,
+    createdAt: newPostByIdInBd!.createdAt,
+  };
+  res.status(201).send(newPost);
+})
