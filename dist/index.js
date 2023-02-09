@@ -16,19 +16,20 @@ const express_1 = __importDefault(require("express"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const blogs_router_1 = require("./routers/blogs-router");
 const db_1 = require("./repositories/db");
+const posts_router_1 = require("./routers/posts-router");
 const app = (0, express_1.default)();
 const port = process.env.PORT || 3000;
 const jsonBodyMiddleware = body_parser_1.default.json();
 app.use(jsonBodyMiddleware);
 app.use('/blogs', blogs_router_1.blogsRouter);
-app.use('/posts', postsRouter);
+app.use('/posts', posts_router_1.postsRouter);
 app.delete("/testing/all-data", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let result = yield db_1.blogsCollections.deleteMany({});
-    let result1 = yield postsCollections.deleteMany({});
+    let result1 = yield db_1.postsCollections.deleteMany({});
     res.send(204);
 }));
 const startApp = () => __awaiter(void 0, void 0, void 0, function* () {
-    yield runDb();
+    yield (0, db_1.runDb)();
     app.listen(port, () => {
         console.log("Example app listening on port: ${port}");
     });

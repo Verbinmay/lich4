@@ -1,5 +1,5 @@
-import { BlogViewModel, PostViewModel } from "../types";
-import { blogsCollections } from "./db";
+import { BlogViewModel, PaginatorPost, PostViewModel } from "../types";
+import { blogsCollections, postsCollections } from "./db";
 
 export const blogsRepository = {
   async findBlogs(
@@ -38,16 +38,16 @@ export const blogsRepository = {
     const ItpagesCount = Math.ceil(IttotalCount / ItPageSize);
     const arrayOfFoundBlogs = await blogsCollections
       .find(filter, { projection: { _id: 0 } })
-      .skip(ItPageNumber * ItPageSize)
+      .skip((ItPageNumber - 1) * ItPageSize)
       .limit(ItPageSize)
       .toArray();
-      const n = [...arrayOfFoundBlogs].sort((u1, u2)=>{ 
-        if(u1[ItSortBy as keyof typeof u1]<u2[ItSortBy as keyof typeof u2]){
-         return ItSortDirection ==="asc"? -1: 1
-        }
-       
-       return 0;
-     })
+    const n = [...arrayOfFoundBlogs].sort((u1, u2) => {
+      if (u1[ItSortBy as keyof typeof u1] < u2[ItSortBy as keyof typeof u2]) {
+        return ItSortDirection === "asc" ? -1 : 1;
+      }
+
+      return 0;
+    });
 
     const newPaginatorBlog = {
       pagesCount: ItpagesCount,
@@ -81,66 +81,60 @@ export const blogsRepository = {
     );
     return result.matchedCount === 1;
   },
-
   async deleteBlog(id: string): Promise<boolean> {
     const result = await blogsCollections.deleteOne({ id: id });
     return result.deletedCount === 1;
   },
-
-  async findPostsByBlogerId(id: string, sortBy: string | undefined | null,
+  async findPostsByBlogerId(
+    id: string,
+    sortBy: string | undefined | null,
     pageNumber: string | undefined | null,
     pageSize: string | undefined | null,
-    sortDirection: string | undefined | null) {
+    sortDirection: string | undefined | null
+  ) {
+    let ItSortBy = "createdAt";
+    if (sortBy != (undefined || null)) {
+      ItSortBy = sortBy;
+    }
 
-      let ItSortBy = "createdAt";
-      if (sortBy != (undefined || null)) {
-        ItSortBy = sortBy;
-      }
-  
-      let ItSortDirection = "desc";
-      if (sortDirection != (undefined || null)) {
-        ItSortDirection = sortDirection;
-      }
-  
-      let ItPageNumber = 1;
-      if (pageNumber != (undefined || null)) {
-        ItPageNumber = Number(pageNumber);
-      }
-  
-      let ItPageSize = 10;
-      if (pageSize != (undefined || null)) {
-        ItPageSize = Number(pageSize);
-      }
-  
-      const IttotalCount = await blogsCollections.countDocuments( { blogId: id });
-  
-      const ItpagesCount = Math.ceil(IttotalCount / ItPageSize);
-      const arrayOfFoundBlogs = await blogsCollections
-        .find( { blogId: id }, { projection: { _id: 0 } })
-        .skip(ItPageNumber * ItPageSize)
-        .limit(ItPageSize)
-        .toArray();
-        const n = [...arrayOfFoundBlogs].sort((u1, u2)=>{ 
-          if(u1[ItSortBy as keyof typeof u1]<u2[ItSortBy as keyof typeof u2]){
-           return ItSortDirection ==="asc"? -1: 1
-          }
-         
-         return 0;
-       })
-  
-      const newPaginatorBlog = {
-        pagesCount: ItpagesCount,
-        page: ItPageNumber,
-        pageSize: ItPageSize,
-        totalCount: IttotalCount,
-        items: n,
-      };
-      return newPaginatorBlog;
-    
+    let ItSortDirection = "desc";
+    if (sortDirection != (undefined || null)) {
+      ItSortDirection = sortDirection;
+    }
 
+    let ItPageNumber = 1;
+    if (pageNumber != (undefined || null)) {
+      ItPageNumber = Number(pageNumber);
+    }
 
+    let ItPageSize = 10;
+    if (pageSize != (undefined || null)) {
+      ItPageSize = Number(pageSize);
+    }
 
-  
-    return newPaginatorBlog;
-  }
+    const IttotalCount = await postsCollections.countDocuments({ blogId: id });
+
+    const ItpagesCount = Math.ceil(IttotalCount / ItPageSize);
+    const arrayOfFoundPosts = await postsCollections
+      .find({ blogId: id }, { projection: { _id: 0 } })
+      .skip((ItPageNumber - 1) * ItPageSize)
+      .limit(ItPageSize)
+      .toArray();
+    const n = [...arrayOfFoundPosts].sort((u1, u2) => {
+      if (u1[ItSortBy as keyof typeof u1] < u2[ItSortBy as keyof typeof u2]) {
+        return ItSortDirection === "asc" ? -1 : 1;
+      }
+
+      return 0;
+    });
+
+    const newPaginatorPosts: PaginatorPost = {
+      pagesCount: ItpagesCount,
+      page: ItPageNumber,
+      pageSize: ItPageSize,
+      totalCount: IttotalCount,
+      items: n,
+    };
+    return newPaginatorPosts;
+  },
 };

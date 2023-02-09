@@ -1,7 +1,7 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, request, Request, Response } from "express";
 import { validationResult, body, param } from "express-validator";
+import { blogsRepository } from "../repositories/blogs-repository";
 import { blogsCollections } from "../repositories/db";
-
 
 export const nameValidation = body("name")
   .isString()
@@ -34,7 +34,7 @@ export const websiteUrlValidation = body("websiteUrl")
   .isLength({ max: 100 })
   .withMessage("WebsiteUrl ength must be max 100");
 
-  export const titleValidation = body("title")
+export const titleValidation = body("title")
   .isString()
   .withMessage("Title isnt string")
   .bail()
@@ -73,34 +73,31 @@ export const isBlogIdValidation = body("blogId").custom(async (value) => {
   }
   return true;
 });
-
-export const isBlogIdValidationInPath = param("id").custom(async (value) => {
-    let result = await blogsCollections.findOne({ id: value });
-    if (result) {
-    }
-    if (result == null) {
-      throw new Error("Please insert existed user id");
-    }
-    return true;
-  });
-
+export async function isBlogIdValidationInPath(req: Request,res: Response,
+  next: NextFunction) {
+  let result = await blogsRepository.findBlogById(req.params.id);
+  if (result === null) {
+    return res.send(404);
+  } else {
+    return next();
+  }
+}
 
 export const inputValidationMiddleware = (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      let newErorsArray = errors.array().map(function (a) {
-        return {
-          message: a.msg,
-          field: a.param,
-        };
-      });
-      res.status(400).json({ errorsMessages: newErorsArray });
-    } else {
-      next();
-    }
-  };
-  
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    let newErorsArray = errors.array().map(function (a) {
+      return {
+        message: a.msg,
+        field: a.param,
+      };
+    });
+    res.status(400).json({ errorsMessages: newErorsArray });
+  } else {
+    next();
+  }
+};

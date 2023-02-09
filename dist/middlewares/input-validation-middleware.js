@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.inputValidationMiddleware = exports.isBlogIdValidationInPath = exports.isBlogIdValidation = exports.contentValidation = exports.shortDescriptionValidation = exports.titleValidation = exports.websiteUrlValidation = exports.descriptionValidation = exports.nameValidation = void 0;
 const express_validator_1 = require("express-validator");
+const blogs_repository_1 = require("../repositories/blogs-repository");
 const db_1 = require("../repositories/db");
 exports.nameValidation = (0, express_validator_1.body)("name")
     .isString()
@@ -81,15 +82,18 @@ exports.isBlogIdValidation = (0, express_validator_1.body)("blogId").custom((val
     }
     return true;
 }));
-exports.isBlogIdValidationInPath = (0, express_validator_1.param)("id").custom((value) => __awaiter(void 0, void 0, void 0, function* () {
-    let result = yield db_1.blogsCollections.findOne({ id: value });
-    if (result) {
-    }
-    if (result == null) {
-        throw new Error("Please insert existed user id");
-    }
-    return true;
-}));
+function isBlogIdValidationInPath(req, res, next) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let result = yield blogs_repository_1.blogsRepository.findBlogById(req.params.id);
+        if (result === null) {
+            return res.send(404);
+        }
+        else {
+            return next();
+        }
+    });
+}
+exports.isBlogIdValidationInPath = isBlogIdValidationInPath;
 const inputValidationMiddleware = (req, res, next) => {
     const errors = (0, express_validator_1.validationResult)(req);
     if (!errors.isEmpty()) {

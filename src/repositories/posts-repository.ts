@@ -33,7 +33,7 @@ export const postsRepository = {
     const ItpagesCount = Math.ceil(IttotalCount / ItPageSize);
     const arrayOfFoundPosts = await postsCollections
       .find({}, { projection: { _id: 0 } })
-      .skip(ItPageNumber * ItPageSize)
+      .skip((ItPageNumber-1) * ItPageSize)
       .limit(ItPageSize)
       .toArray()
       ;

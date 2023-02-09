@@ -34,7 +34,7 @@ exports.postsRepository = {
             const ItpagesCount = Math.ceil(IttotalCount / ItPageSize);
             const arrayOfFoundPosts = yield db_1.postsCollections
                 .find({}, { projection: { _id: 0 } })
-                .skip(ItPageNumber * ItPageSize)
+                .skip((ItPageNumber - 1) * ItPageSize)
                 .limit(ItPageSize)
                 .toArray();
             const n = [...arrayOfFoundPosts].sort((u1, u2) => {

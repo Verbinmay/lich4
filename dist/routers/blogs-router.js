@@ -85,34 +85,30 @@ exports.blogsRouter.delete("/:id", Avtorization_middleware_1.avtorizationValidat
         res.send(404);
     }
 }));
-exports.blogsRouter.get("/:id/posts", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.blogsRouter.get("/:id/posts", input_validation_middleware_1.isBlogIdValidationInPath, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _f, _g, _h, _j;
-    const foundPostsByBlogerIdInBd = yield blogs_repository_1.blogsRepository.findPostsByBlogerId(req.path, (_f = req.query.sortBy) === null || _f === void 0 ? void 0 : _f.toString(), (_g = req.query.pageNumber) === null || _g === void 0 ? void 0 : _g.toString(), (_h = req.query.pageSize) === null || _h === void 0 ? void 0 : _h.toString(), (_j = req.query.sortDirection) === null || _j === void 0 ? void 0 : _j.toString());
-    if (foundPostsByBlogerIdInBd) {
-        const foundBlogs = {
-            pagesCount: foundPostsByBlogerIdInBd.pagesCount,
-            page: foundPostsByBlogerIdInBd.page,
-            pageSize: foundPostsByBlogerIdInBd.pageSize,
-            totalCount: foundPostsByBlogerIdInBd.totalCount,
-            items: foundPostsByBlogerIdInBd.items.map((m) => {
-                return {
-                    id: m.id,
-                    name: m.name,
-                    description: m.description,
-                    websiteUrl: m.websiteUrl,
-                    createdAt: m.createdAt,
-                    isMembership: m.isMembership,
-                };
-            }),
-        };
-        res.send(foundBlogs);
-    }
-    else {
-        res.send(404);
-    }
+    const foundPostsByBlogerIdInBd = yield blogs_repository_1.blogsRepository.findPostsByBlogerId(req.params.id, (_f = req.query.sortBy) === null || _f === void 0 ? void 0 : _f.toString(), (_g = req.query.pageNumber) === null || _g === void 0 ? void 0 : _g.toString(), (_h = req.query.pageSize) === null || _h === void 0 ? void 0 : _h.toString(), (_j = req.query.sortDirection) === null || _j === void 0 ? void 0 : _j.toString());
+    const foundBlogs = {
+        pagesCount: foundPostsByBlogerIdInBd.pagesCount,
+        page: foundPostsByBlogerIdInBd.page,
+        pageSize: foundPostsByBlogerIdInBd.pageSize,
+        totalCount: foundPostsByBlogerIdInBd.totalCount,
+        items: foundPostsByBlogerIdInBd.items.map((m) => {
+            return {
+                id: m.id,
+                title: m.title,
+                shortDescription: m.shortDescription,
+                content: m.content,
+                blogId: m.blogId,
+                blogName: m.blogName,
+                createdAt: m.createdAt,
+            };
+        }),
+    };
+    res.status(200).send(foundBlogs);
 }));
-exports.blogsRouter.post("/:id/posts", Avtorization_middleware_1.avtorizationValidationMiddleware, input_validation_middleware_1.shortDescriptionValidation, input_validation_middleware_1.titleValidation, input_validation_middleware_1.contentValidation, input_validation_middleware_1.isBlogIdValidationInPath, input_validation_middleware_1.inputValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const newPostByIdInBd = yield posts_server_1.postsService.createPost(req.body.title, req.body.shortDescription, req.body.content, req.path);
+exports.blogsRouter.post("/:id/posts", Avtorization_middleware_1.avtorizationValidationMiddleware, input_validation_middleware_1.isBlogIdValidationInPath, input_validation_middleware_1.shortDescriptionValidation, input_validation_middleware_1.titleValidation, input_validation_middleware_1.contentValidation, input_validation_middleware_1.inputValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const newPostByIdInBd = yield posts_server_1.postsService.createPost(req.body.title, req.body.shortDescription, req.body.content, req.params.id);
     const newPost = {
         id: newPostByIdInBd.id,
         title: newPostByIdInBd.title,

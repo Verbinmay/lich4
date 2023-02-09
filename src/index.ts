@@ -1,7 +1,8 @@
 import express,{Request, Response} from 'express'
 import bodyParser from "body-parser";
 import { blogsRouter } from './routers/blogs-router';
-import { blogsCollections } from './repositories/db';
+import { blogsCollections, postsCollections, runDb } from './repositories/db';
+import { postsRouter } from './routers/posts-router';
 const app = express()
 const port = process.env.PORT || 3000;
 

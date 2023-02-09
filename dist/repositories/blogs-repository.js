@@ -38,7 +38,7 @@ exports.blogsRepository = {
             const ItpagesCount = Math.ceil(IttotalCount / ItPageSize);
             const arrayOfFoundBlogs = yield db_1.blogsCollections
                 .find(filter, { projection: { _id: 0 } })
-                .skip(ItPageNumber * ItPageSize)
+                .skip((ItPageNumber - 1) * ItPageSize)
                 .limit(ItPageSize)
                 .toArray();
             const n = [...arrayOfFoundBlogs].sort((u1, u2) => {
@@ -99,28 +99,27 @@ exports.blogsRepository = {
             if (pageSize != (undefined || null)) {
                 ItPageSize = Number(pageSize);
             }
-            const IttotalCount = yield db_1.blogsCollections.countDocuments({ blogId: id });
+            const IttotalCount = yield db_1.postsCollections.countDocuments({ blogId: id });
             const ItpagesCount = Math.ceil(IttotalCount / ItPageSize);
-            const arrayOfFoundBlogs = yield db_1.blogsCollections
+            const arrayOfFoundPosts = yield db_1.postsCollections
                 .find({ blogId: id }, { projection: { _id: 0 } })
-                .skip(ItPageNumber * ItPageSize)
+                .skip((ItPageNumber - 1) * ItPageSize)
                 .limit(ItPageSize)
                 .toArray();
-            const n = [...arrayOfFoundBlogs].sort((u1, u2) => {
+            const n = [...arrayOfFoundPosts].sort((u1, u2) => {
                 if (u1[ItSortBy] < u2[ItSortBy]) {
                     return ItSortDirection === "asc" ? -1 : 1;
                 }
                 return 0;
             });
-            const newPaginatorBlog = {
+            const newPaginatorPosts = {
                 pagesCount: ItpagesCount,
                 page: ItPageNumber,
                 pageSize: ItPageSize,
                 totalCount: IttotalCount,
                 items: n,
             };
-            return newPaginatorBlog;
-            return newPaginatorBlog;
+            return newPaginatorPosts;
         });
-    }
+    },
 };

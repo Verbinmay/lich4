@@ -2,9 +2,24 @@ import { Request, Response, Router } from "express";
 import { blogsService } from "../domain/blogs-server";
 import { postsService } from "../domain/posts-server";
 import { avtorizationValidationMiddleware } from "../middlewares/Avtorization-middleware";
-import { websiteUrlValidation, nameValidation, descriptionValidation, inputValidationMiddleware, shortDescriptionValidation, titleValidation, contentValidation, isBlogIdValidationInPath } from "../middlewares/input-validation-middleware";
+import {
+  websiteUrlValidation,
+  nameValidation,
+  descriptionValidation,
+  inputValidationMiddleware,
+  shortDescriptionValidation,
+  titleValidation,
+  contentValidation,
+  isBlogIdValidationInPath,
+} from "../middlewares/input-validation-middleware";
 import { blogsRepository } from "../repositories/blogs-repository";
-import { BlogViewModel, PaginatorBlog, PostViewModel } from "../types";
+import { blogsCollections } from "../repositories/db";
+import {
+  BlogViewModel,
+  PaginatorBlog,
+  PaginatorPost,
+  PostViewModel,
+} from "../types";
 
 export const blogsRouter = Router({});
 
@@ -34,7 +49,6 @@ blogsRouter.get("/", async (req: Request, res: Response) => {
   };
   res.send(foundBlogs);
 });
-
 blogsRouter.get("/:id", async (req: Request, res: Response) => {
   const foundBlogInBd = await blogsRepository.findBlogById(req.params.id);
   if (foundBlogInBd) {
@@ -51,71 +65,75 @@ blogsRouter.get("/:id", async (req: Request, res: Response) => {
     res.send(404);
   }
 });
-
-blogsRouter.post("/",
-avtorizationValidationMiddleware,
-    websiteUrlValidation,
-    nameValidation,
-    descriptionValidation,
-    inputValidationMiddleware,
-async (req: Request, res: Response) => {
-  const newBlogInBd = await blogsService.createBlog(
-    req.body.name,
-    req.body.description,
-    req.body.websiteUrl
-  );
-  const newBlog: BlogViewModel = {
-    id: newBlogInBd!.id,
-    name: newBlogInBd!.name,
-    description: newBlogInBd!.description,
-    websiteUrl: newBlogInBd!.websiteUrl,
-    createdAt: newBlogInBd!.createdAt,
-    isMembership: newBlogInBd!.isMembership,
-  };
-  res.status(201).send(newBlog);
-});
-
-blogsRouter.put("/:id", 
-avtorizationValidationMiddleware,
-websiteUrlValidation,
-nameValidation,
-descriptionValidation,
-inputValidationMiddleware,
-async (req: Request, res: Response) => {
-  const updateBlogInBd = await blogsService.updateBlog(
-    req.params.id,
-    req.body.name,
-    req.body.description,
-    req.body.websiteUrl
-  );
-  if (updateBlogInBd) {
-    res.send(204);
-  } else {
-    res.send(404);
+blogsRouter.post(
+  "/",
+  avtorizationValidationMiddleware,
+  websiteUrlValidation,
+  nameValidation,
+  descriptionValidation,
+  inputValidationMiddleware,
+  async (req: Request, res: Response) => {
+    const newBlogInBd = await blogsService.createBlog(
+      req.body.name,
+      req.body.description,
+      req.body.websiteUrl
+    );
+    const newBlog: BlogViewModel = {
+      id: newBlogInBd!.id,
+      name: newBlogInBd!.name,
+      description: newBlogInBd!.description,
+      websiteUrl: newBlogInBd!.websiteUrl,
+      createdAt: newBlogInBd!.createdAt,
+      isMembership: newBlogInBd!.isMembership,
+    };
+    res.status(201).send(newBlog);
   }
-});
-
-blogsRouter.delete("/:id",
-avtorizationValidationMiddleware,
-async (req: Request, res: Response) => {
-  const DeleteBlogInBd = await blogsService.deleteBlog(req.params.id);
-  if (DeleteBlogInBd) {
-    res.send(204);
-  } else {
-    res.send(404);
+);
+blogsRouter.put(
+  "/:id",
+  avtorizationValidationMiddleware,
+  websiteUrlValidation,
+  nameValidation,
+  descriptionValidation,
+  inputValidationMiddleware,
+  async (req: Request, res: Response) => {
+    const updateBlogInBd = await blogsService.updateBlog(
+      req.params.id,
+      req.body.name,
+      req.body.description,
+      req.body.websiteUrl
+    );
+    if (updateBlogInBd) {
+      res.send(204);
+    } else {
+      res.send(404);
+    }
   }
-});
+);
+blogsRouter.delete(
+  "/:id",
+  avtorizationValidationMiddleware,
+  async (req: Request, res: Response) => {
+    const DeleteBlogInBd = await blogsService.deleteBlog(req.params.id);
+    if (DeleteBlogInBd) {
+      res.send(204);
+    } else {
+      res.send(404);
+    }
+  }
+);
 
-blogsRouter.get("/:id/posts", async (req: Request, res: Response) => {
-  const foundPostsByBlogerIdInBd = await blogsRepository.findPostsByBlogerId(
-    req.path,
-    req.query.sortBy?.toString(),
-    req.query.pageNumber?.toString(),
-    req.query.pageSize?.toString(),
-    req.query.sortDirection?.toString()
-  );
-  if (foundPostsByBlogerIdInBd) {
-    const foundBlogs: PaginatorBlog = {
+blogsRouter.get("/:id/posts",
+isBlogIdValidationInPath,
+async (req: Request, res: Response) => {
+    const foundPostsByBlogerIdInBd = await blogsRepository.findPostsByBlogerId(
+      req.params.id,
+      req.query.sortBy?.toString(),
+      req.query.pageNumber?.toString(),
+      req.query.pageSize?.toString(),
+      req.query.sortDirection?.toString()
+    );
+    const foundBlogs: PaginatorPost = {
       pagesCount: foundPostsByBlogerIdInBd.pagesCount,
       page: foundPostsByBlogerIdInBd.page,
       pageSize: foundPostsByBlogerIdInBd.pageSize,
@@ -123,42 +141,41 @@ blogsRouter.get("/:id/posts", async (req: Request, res: Response) => {
       items: foundPostsByBlogerIdInBd.items.map((m) => {
         return {
           id: m.id,
-          name: m.name,
-          description: m.description,
-          websiteUrl: m.websiteUrl,
+          title: m.title,
+          shortDescription: m.shortDescription,
+          content: m.content,
+          blogId: m.blogId,
+          blogName: m.blogName,
           createdAt: m.createdAt,
-          isMembership: m.isMembership,
         };
       }),
     };
-    res.send(foundBlogs);
-  } else {
-    res.send(404);
-  }
+    res.status(200).send(foundBlogs);
 });
-blogsRouter.post("/:id/posts",
-avtorizationValidationMiddleware,
-shortDescriptionValidation,
-    titleValidation,
-    contentValidation,
-    isBlogIdValidationInPath,
-    inputValidationMiddleware,
-async( req:Request, res:Response)=> {
-  const newPostByIdInBd = await postsService.createPost(
-    
-    req.body.title,
-    req.body.shortDescription,
-    req.body.content,
-    req.path,
-  );
-  const newPost: PostViewModel = {
-    id: newPostByIdInBd!.id,
-    title: newPostByIdInBd!.title,
-    shortDescription: newPostByIdInBd!.shortDescription,
-    content: newPostByIdInBd!.content,
-    blogId: newPostByIdInBd!.blogId,
-    blogName: newPostByIdInBd!.blogName,
-    createdAt: newPostByIdInBd!.createdAt,
-  };
-  res.status(201).send(newPost);
-})
+blogsRouter.post(
+  "/:id/posts",
+  avtorizationValidationMiddleware,
+  isBlogIdValidationInPath,
+  shortDescriptionValidation,
+  titleValidation,
+  contentValidation,
+  inputValidationMiddleware,
+  async (req: Request, res: Response) => {
+    const newPostByIdInBd = await postsService.createPost(
+      req.body.title,
+      req.body.shortDescription,
+      req.body.content,
+      req.params.id
+    );
+    const newPost: PostViewModel = {
+      id: newPostByIdInBd!.id,
+      title: newPostByIdInBd!.title,
+      shortDescription: newPostByIdInBd!.shortDescription,
+      content: newPostByIdInBd!.content,
+      blogId: newPostByIdInBd!.blogId,
+      blogName: newPostByIdInBd!.blogName,
+      createdAt: newPostByIdInBd!.createdAt,
+    };
+    res.status(201).send(newPost);
+  }
+);
