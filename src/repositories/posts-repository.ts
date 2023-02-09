@@ -64,7 +64,7 @@ export const postsRepository = {
   },
   async createPost(createdPost: PostViewModel) {
     const result = await postsCollections.insertOne(createdPost);
-    return postsRepository.findPostById(createdPost.id);
+    return await postsRepository.findPostById(createdPost.id);
   },
   async updatePost(
     id: string,

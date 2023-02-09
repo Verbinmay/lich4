@@ -10,16 +10,20 @@ export const postsService = {
     blogId: string
   ) {
     let isId: string = "";
+
+    let findArray = await postsCollections.find({}).toArray();
+    let mappedArray = [...findArray].map((n) => {
+      return n.id;
+    });
     let schetchik = false;
     let i = 0;
     do {
       i++;
-      let findIdPost = await postsCollections.findOne({ id: String(i) });
-      if (!findIdPost) {
-        isId = String(i);
-        schetchik = true;
-      }
-    } while (schetchik === false);
+      schetchik = mappedArray.includes(String(i));
+    } while (schetchik === true);
+    isId = String(i);
+
+  
     let isPostName = "";
     let a = await blogsRepository.findBlogById(blogId);
     if (a) {

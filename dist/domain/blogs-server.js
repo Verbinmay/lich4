@@ -16,16 +16,17 @@ exports.blogsService = {
     createBlog(name, description, websiteUrl) {
         return __awaiter(this, void 0, void 0, function* () {
             let isId = "";
+            let findArray = yield db_1.blogsCollections.find({}).toArray();
+            let mappedArray = [...findArray].map((n) => {
+                return n.id;
+            });
             let schetchik = false;
             let i = 0;
             do {
                 i++;
-                let findIdPost = yield db_1.blogsCollections.findOne({ id: String(i) });
-                if (!findIdPost) {
-                    isId = String(i);
-                    schetchik = true;
-                }
-            } while (schetchik === false);
+                schetchik = mappedArray.includes(String(i));
+            } while (schetchik === true);
+            isId = String(i);
             let isCreateAt = "";
             const today = new Date();
             isCreateAt = today.toISOString();

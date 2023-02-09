@@ -64,7 +64,7 @@ exports.postsRepository = {
     createPost(createdPost) {
         return __awaiter(this, void 0, void 0, function* () {
             const result = yield db_1.postsCollections.insertOne(createdPost);
-            return exports.postsRepository.findPostById(createdPost.id);
+            return yield exports.postsRepository.findPostById(createdPost.id);
         });
     },
     updatePost(id, title, shortDescription, content, blogId) {
