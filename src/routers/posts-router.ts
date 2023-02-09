@@ -1,5 +1,7 @@
 import { Request, Response, Router } from "express";
 import { postsService } from "../domain/posts-server";
+import { avtorizationValidationMiddleware } from "../middlewares/Avtorization-middleware";
+import { shortDescriptionValidation, titleValidation, contentValidation, isBlogIdValidation, inputValidationMiddleware } from "../middlewares/input-validation-middleware";
 import { postsRepository } from "../repositories/posts-repository";
 import { PaginatorPost, PostViewModel } from "../types";
 
@@ -50,7 +52,14 @@ postsRouter.get("/:id", async (req: Request, res: Response) => {
   }
 });
 
-postsRouter.post("/", async (req: Request, res: Response) => {
+postsRouter.post("/",
+avtorizationValidationMiddleware,
+    shortDescriptionValidation,
+    titleValidation,
+    contentValidation,
+    isBlogIdValidation,
+    inputValidationMiddleware,
+async (req: Request, res: Response) => {
   const newPostInBd = await postsService.createPost(
     req.body.title,
     req.body.shortDescription,
@@ -69,7 +78,14 @@ postsRouter.post("/", async (req: Request, res: Response) => {
   res.status(201).send(newPost);
 });
 
-postsRouter.put("/:id", async (req: Request, res: Response) => {
+postsRouter.put("/:id", 
+avtorizationValidationMiddleware,
+shortDescriptionValidation,
+titleValidation,
+contentValidation,
+isBlogIdValidation,
+inputValidationMiddleware,
+async (req: Request, res: Response) => {
   const updatePostInBd = await postsService.updatePost(
     req.params.id,
     req.body.title,
@@ -84,7 +100,9 @@ postsRouter.put("/:id", async (req: Request, res: Response) => {
   }
 });
 
-postsRouter.delete("/:id", async (req: Request, res: Response) => {
+postsRouter.delete("/:id",
+avtorizationValidationMiddleware,
+async (req: Request, res: Response) => {
   const DeletePostInBd = await postsService.deletePost(req.params.id);
   if (DeletePostInBd) {
     res.send(204);
