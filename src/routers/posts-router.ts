@@ -1,6 +1,6 @@
 import { Request, Response, Router } from "express";
 import { postsService } from "../domain/posts-server";
-import { avtorizationValidationMiddleware } from "../middlewares/Avtorization-middleware";
+import { avtorizationValidationMiddleware } from "../middlewares/avtorization-middleware";
 import { shortDescriptionValidation, titleValidation, contentValidation, isBlogIdValidation, inputValidationMiddleware } from "../middlewares/input-validation-middleware";
 import { postsRepository } from "../repositories/posts-repository";
 import { PaginatorPost, PostViewModel } from "../types";

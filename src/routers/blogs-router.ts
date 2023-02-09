@@ -1,7 +1,8 @@
 import { Request, Response, Router } from "express";
 import { blogsService } from "../domain/blogs-server";
 import { postsService } from "../domain/posts-server";
-import { avtorizationValidationMiddleware } from "../middlewares/Avtorization-middleware";
+import { avtorizationValidationMiddleware } from "../middlewares/avtorization-middleware";
+
 import {
   websiteUrlValidation,
   nameValidation,

@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.postsRouter = void 0;
 const express_1 = require("express");
 const posts_server_1 = require("../domain/posts-server");
-const Avtorization_middleware_1 = require("../middlewares/Avtorization-middleware");
+const avtorization_middleware_1 = require("../middlewares/avtorization-middleware");
 const input_validation_middleware_1 = require("../middlewares/input-validation-middleware");
 const posts_repository_1 = require("../repositories/posts-repository");
 exports.postsRouter = (0, express_1.Router)({});
@@ -56,7 +56,7 @@ exports.postsRouter.get("/:id", (req, res) => __awaiter(void 0, void 0, void 0, 
         res.send(404);
     }
 }));
-exports.postsRouter.post("/", Avtorization_middleware_1.avtorizationValidationMiddleware, input_validation_middleware_1.shortDescriptionValidation, input_validation_middleware_1.titleValidation, input_validation_middleware_1.contentValidation, input_validation_middleware_1.isBlogIdValidation, input_validation_middleware_1.inputValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.postsRouter.post("/", avtorization_middleware_1.avtorizationValidationMiddleware, input_validation_middleware_1.shortDescriptionValidation, input_validation_middleware_1.titleValidation, input_validation_middleware_1.contentValidation, input_validation_middleware_1.isBlogIdValidation, input_validation_middleware_1.inputValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const newPostInBd = yield posts_server_1.postsService.createPost(req.body.title, req.body.shortDescription, req.body.content, req.body.blogId);
     const newPost = {
         id: newPostInBd.id,
@@ -69,7 +69,7 @@ exports.postsRouter.post("/", Avtorization_middleware_1.avtorizationValidationMi
     };
     res.status(201).send(newPost);
 }));
-exports.postsRouter.put("/:id", Avtorization_middleware_1.avtorizationValidationMiddleware, input_validation_middleware_1.shortDescriptionValidation, input_validation_middleware_1.titleValidation, input_validation_middleware_1.contentValidation, input_validation_middleware_1.isBlogIdValidation, input_validation_middleware_1.inputValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.postsRouter.put("/:id", avtorization_middleware_1.avtorizationValidationMiddleware, input_validation_middleware_1.shortDescriptionValidation, input_validation_middleware_1.titleValidation, input_validation_middleware_1.contentValidation, input_validation_middleware_1.isBlogIdValidation, input_validation_middleware_1.inputValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const updatePostInBd = yield posts_server_1.postsService.updatePost(req.params.id, req.body.title, req.body.shortDescription, req.body.content, req.body.blogId);
     if (updatePostInBd) {
         res.send(204);
@@ -78,7 +78,7 @@ exports.postsRouter.put("/:id", Avtorization_middleware_1.avtorizationValidation
         res.send(404);
     }
 }));
-exports.postsRouter.delete("/:id", Avtorization_middleware_1.avtorizationValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+exports.postsRouter.delete("/:id", avtorization_middleware_1.avtorizationValidationMiddleware, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const DeletePostInBd = yield posts_server_1.postsService.deletePost(req.params.id);
     if (DeletePostInBd) {
         res.send(204);
