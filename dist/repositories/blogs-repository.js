@@ -26,6 +26,12 @@ exports.blogsRepository = {
             if (sortDirection != (undefined || null)) {
                 ItSortDirection = sortDirection;
             }
+            let pomogator = 1;
+            if (ItSortDirection === "asc") {
+                pomogator = -1;
+            }
+            const filterSort = {};
+            filterSort[ItSortBy] = pomogator;
             let ItPageNumber = 1;
             if (pageNumber != (undefined || null)) {
                 ItPageNumber = Number(pageNumber);
@@ -38,15 +44,11 @@ exports.blogsRepository = {
             const ItpagesCount = Math.ceil(IttotalCount / ItPageSize);
             const arrayOfFoundBlogs = yield db_1.blogsCollections
                 .find(filter, { projection: { _id: 0 } })
+                .sort(filterSort)
                 .skip((ItPageNumber - 1) * ItPageSize)
                 .limit(ItPageSize)
                 .toArray();
-            const n = [...arrayOfFoundBlogs].sort((u1, u2) => {
-                if (u1[ItSortBy] < u2[ItSortBy]) {
-                    return ItSortDirection === "asc" ? -1 : 1;
-                }
-                return 0;
-            });
+            const n = [...arrayOfFoundBlogs];
             const newPaginatorBlog = {
                 pagesCount: ItpagesCount,
                 page: ItPageNumber,
@@ -91,6 +93,12 @@ exports.blogsRepository = {
             if (sortDirection != (undefined || null)) {
                 ItSortDirection = sortDirection;
             }
+            let pomogator = 1;
+            if (ItSortDirection === "asc") {
+                pomogator = -1;
+            }
+            const filterSort = {};
+            filterSort[ItSortBy] = pomogator;
             let ItPageNumber = 1;
             if (pageNumber != (undefined || null)) {
                 ItPageNumber = Number(pageNumber);
@@ -103,15 +111,11 @@ exports.blogsRepository = {
             const ItpagesCount = Math.ceil(IttotalCount / ItPageSize);
             const arrayOfFoundPosts = yield db_1.postsCollections
                 .find({ blogId: id }, { projection: { _id: 0 } })
+                .sort(filterSort)
                 .skip((ItPageNumber - 1) * ItPageSize)
                 .limit(ItPageSize)
                 .toArray();
-            const n = [...arrayOfFoundPosts].sort((u1, u2) => {
-                if (u1[ItSortBy] < u2[ItSortBy]) {
-                    return ItSortDirection === "asc" ? -1 : 1;
-                }
-                return 0;
-            });
+            const n = [...arrayOfFoundPosts];
             const newPaginatorPosts = {
                 pagesCount: ItpagesCount,
                 page: ItPageNumber,

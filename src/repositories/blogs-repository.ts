@@ -1,3 +1,4 @@
+import { fileURLToPath } from "url";
 import { BlogViewModel, PaginatorPost, PostViewModel } from "../types";
 import { blogsCollections, postsCollections } from "./db";
 
@@ -17,11 +18,16 @@ export const blogsRepository = {
     if (sortBy != (undefined || null)) {
       ItSortBy = sortBy;
     }
-
     let ItSortDirection = "desc";
     if (sortDirection != (undefined || null)) {
       ItSortDirection = sortDirection;
     }
+    let pomogator = 1;
+    if (ItSortDirection === "asc") {
+      pomogator = -1;
+    }
+    const filterSort: any = {};
+    filterSort[ItSortBy as keyof typeof filterSort] = pomogator;
 
     let ItPageNumber = 1;
     if (pageNumber != (undefined || null)) {
@@ -38,16 +44,12 @@ export const blogsRepository = {
     const ItpagesCount = Math.ceil(IttotalCount / ItPageSize);
     const arrayOfFoundBlogs = await blogsCollections
       .find(filter, { projection: { _id: 0 } })
+      .sort(filterSort)
       .skip((ItPageNumber - 1) * ItPageSize)
       .limit(ItPageSize)
       .toArray();
-    const n = [...arrayOfFoundBlogs].sort((u1, u2) => {
-      if (u1[ItSortBy as keyof typeof u1] < u2[ItSortBy as keyof typeof u2]) {
-        return ItSortDirection === "asc" ? -1 : 1;
-      }
 
-      return 0;
-    });
+      const n = [...arrayOfFoundBlogs]
 
     const newPaginatorBlog = {
       pagesCount: ItpagesCount,
@@ -102,6 +104,13 @@ export const blogsRepository = {
       ItSortDirection = sortDirection;
     }
 
+    let pomogator = 1;
+    if (ItSortDirection === "asc") {
+      pomogator = -1;
+    }
+    const filterSort: any = {};
+    filterSort[ItSortBy as keyof typeof filterSort] = pomogator;
+
     let ItPageNumber = 1;
     if (pageNumber != (undefined || null)) {
       ItPageNumber = Number(pageNumber);
@@ -117,17 +126,11 @@ export const blogsRepository = {
     const ItpagesCount = Math.ceil(IttotalCount / ItPageSize);
     const arrayOfFoundPosts = await postsCollections
       .find({ blogId: id }, { projection: { _id: 0 } })
+      .sort(filterSort)
       .skip((ItPageNumber - 1) * ItPageSize)
       .limit(ItPageSize)
       .toArray();
-    const n = [...arrayOfFoundPosts].sort((u1, u2) => {
-      if (u1[ItSortBy as keyof typeof u1] < u2[ItSortBy as keyof typeof u2]) {
-        return ItSortDirection === "asc" ? -1 : 1;
-      }
-
-      return 0;
-    });
-
+      const n = [...arrayOfFoundPosts]
     const newPaginatorPosts: PaginatorPost = {
       pagesCount: ItpagesCount,
       page: ItPageNumber,

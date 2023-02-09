@@ -22,6 +22,12 @@ exports.postsRepository = {
             if (sortDirection != (undefined || null)) {
                 ItSortDirection = sortDirection;
             }
+            let pomogator = 1;
+            if (ItSortDirection === "asc") {
+                pomogator = -1;
+            }
+            const filterSort = {};
+            filterSort[ItSortBy] = pomogator;
             let ItPageNumber = 1;
             if (pageNumber != (undefined || null)) {
                 ItPageNumber = Number(pageNumber);
@@ -34,15 +40,11 @@ exports.postsRepository = {
             const ItpagesCount = Math.ceil(IttotalCount / ItPageSize);
             const arrayOfFoundPosts = yield db_1.postsCollections
                 .find({}, { projection: { _id: 0 } })
+                .sort(filterSort)
                 .skip((ItPageNumber - 1) * ItPageSize)
                 .limit(ItPageSize)
                 .toArray();
-            const n = [...arrayOfFoundPosts].sort((u1, u2) => {
-                if (u1[ItSortBy] < u2[ItSortBy]) {
-                    return ItSortDirection === "asc" ? -1 : 1;
-                }
-                return 0;
-            });
+            const n = [...arrayOfFoundPosts];
             const newPaginatorBlog = {
                 pagesCount: ItpagesCount,
                 page: ItPageNumber,
