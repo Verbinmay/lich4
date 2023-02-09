@@ -104,9 +104,9 @@ export const blogsRepository = {
       ItSortDirection = sortDirection;
     }
 
-    let pomogator = 1;
+    let pomogator = -1;
     if (ItSortDirection === "asc") {
-      pomogator = -1;
+      pomogator = 1;
     }
     const filterSort: any = {};
     filterSort[ItSortBy as keyof typeof filterSort] = pomogator;
