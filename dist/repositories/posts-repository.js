@@ -22,9 +22,9 @@ exports.postsRepository = {
             if (sortDirection != (undefined || null)) {
                 ItSortDirection = sortDirection;
             }
-            let pomogator = -1;
+            let pomogator = 1;
             if (ItSortDirection === "asc") {
-                pomogator = 1;
+                pomogator = +1;
             }
             const filterSort = {};
             filterSort[ItSortBy] = pomogator;
