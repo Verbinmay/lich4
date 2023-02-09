@@ -19,7 +19,7 @@ export const blogsService = {
     const today = new Date();
     isCreateAt = today.toISOString();
 
-    let isIsMembership: boolean = true;
+    let isIsMembership: boolean = false;
     const createdBlog = {
       id: isId,
       name: name,
