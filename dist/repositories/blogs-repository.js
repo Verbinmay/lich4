@@ -12,11 +12,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.blogsRepository = void 0;
 const db_1 = require("./db");
 exports.blogsRepository = {
-    findBlogs(title, sortBy, pageNumber, pageSize, sortDirection) {
+    findBlogs(name, sortBy, pageNumber, pageSize, sortDirection) {
         return __awaiter(this, void 0, void 0, function* () {
             const filter = {};
-            if (title) {
-                filter.title = { $regex: "(?i)" + title + "(?-i)" };
+            if (name) {
+                filter.name = { $regex: "(?i)" + name + "(?-i)" };
             }
             let ItSortBy = "createdAt";
             if (sortBy != (undefined || null)) {

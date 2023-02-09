@@ -4,15 +4,15 @@ import { blogsCollections, postsCollections } from "./db";
 
 export const blogsRepository = {
   async findBlogs(
-    title: string | undefined | null,
+    name: string | undefined | null,
     sortBy: string | undefined | null,
     pageNumber: string | undefined | null,
     pageSize: string | undefined | null,
     sortDirection: string | undefined | null
   ) {
     const filter: any = {};
-    if (title) {
-      filter.title = { $regex: "(?i)" + title + "(?-i)" };
+    if (name) {
+      filter.name = { $regex: "(?i)" + name + "(?-i)" };
     }
     let ItSortBy = "createdAt";
     if (sortBy != (undefined || null)) {

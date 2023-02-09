@@ -19,7 +19,7 @@ const blogs_repository_1 = require("../repositories/blogs-repository");
 exports.blogsRouter = (0, express_1.Router)({});
 exports.blogsRouter.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b, _c, _d, _e;
-    const foundBlogsInBd = yield blogs_repository_1.blogsRepository.findBlogs((_a = req.query.title) === null || _a === void 0 ? void 0 : _a.toString(), (_b = req.query.sortBy) === null || _b === void 0 ? void 0 : _b.toString(), (_c = req.query.pageNumber) === null || _c === void 0 ? void 0 : _c.toString(), (_d = req.query.pageSize) === null || _d === void 0 ? void 0 : _d.toString(), (_e = req.query.sortDirection) === null || _e === void 0 ? void 0 : _e.toString());
+    const foundBlogsInBd = yield blogs_repository_1.blogsRepository.findBlogs((_a = req.query.searchNameTerm) === null || _a === void 0 ? void 0 : _a.toString(), (_b = req.query.sortBy) === null || _b === void 0 ? void 0 : _b.toString(), (_c = req.query.pageNumber) === null || _c === void 0 ? void 0 : _c.toString(), (_d = req.query.pageSize) === null || _d === void 0 ? void 0 : _d.toString(), (_e = req.query.sortDirection) === null || _e === void 0 ? void 0 : _e.toString());
     const foundBlogs = {
         pagesCount: foundBlogsInBd.pagesCount,
         page: foundBlogsInBd.page,

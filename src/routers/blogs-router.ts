@@ -26,7 +26,7 @@ export const blogsRouter = Router({});
 
 blogsRouter.get("/", async (req: Request, res: Response) => {
   const foundBlogsInBd = await blogsRepository.findBlogs(
-    req.query.title?.toString(),
+    req.query.searchNameTerm?.toString(),
     req.query.sortBy?.toString(),
     req.query.pageNumber?.toString(),
     req.query.pageSize?.toString(),
@@ -37,7 +37,7 @@ blogsRouter.get("/", async (req: Request, res: Response) => {
     page: foundBlogsInBd.page,
     pageSize: foundBlogsInBd.pageSize,
     totalCount: foundBlogsInBd.totalCount,
-    items: foundBlogsInBd.items.map((m) => {
+    items: foundBlogsInBd.items.map((m:any) => {
       return {
         id: m.id,
         name: m.name,
